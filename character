@@ -1,0 +1,108 @@
+import random
+class Character:
+    def __init__(self, name, hp, attack, role):
+        self.name = name
+        self.max_hp = hp
+        self.hp = hp
+        self.attack = attack
+        self.role = role
+        self.inventory = {"potion": 1}
+        self.dodge_chance = 0.15 if role == "Rogue" else 0.05
+        self.crit_chance = 0.2 if role == "Mage" else 0.05
+
+    def is_alive(self):
+        return self.hp > 0
+
+    def take_damage(self, damage):
+        if random.random() < self.dodge_chance:
+            print(f"{self.name} dodged the attack!")
+            return
+
+        self.hp -= damage
+        self.hp = max(self.hp, 0)
+        print(f"{self.name} takes {damage} damage! HP left: {self.hp}")
+
+    def deal_damage(self, target):
+        damage = random.randint(self.attack - 2, self.attack + 2)
+        if random.random() < self.crit_chance:
+            damage *= 2
+            print("Critical Hit!")
+        print(f"{self.name} attacks {target.name}!")
+        target.take_damage(damage)
+    
+    def increase_attack(self, number):
+        self.attack += number
+        print(f"{self.name} gains +{number} attack!")
+
+    def increase_max_hp(self, number):
+        self.max_hp += number
+        self.hp += number
+        print(f"{self.name}'s max HP increases by {number}! Now {self.hp}/{self.max_hp}.")
+
+    def use_potion(self):
+        if self.inventory.get("potion", 0) > 0:
+            self.inventory["potion"] -= 1
+            heal = 15
+            self.hp = min(self.max_hp, self.hp + heal)
+            print(f"{self.name} uses a potion and heals {heal} HP! HP is now {self.hp}/{self.max_hp}.")
+        else:
+            print("No potions left!")
+
+def choose_class():
+    print("Choose your class:")
+    print("1. Warrior (+10 HP)")
+    print("2. Rogue (15% Dodge Chance)")
+    print("3. Mage (20% Critical Hit Chance)")
+    choice = input("> ")
+    if choice == "1":
+        return "Warrior", 40, 8
+    elif choice == "2":
+        return "Rogue", 30, 8
+    elif choice == "3":
+        return "Mage", 30, 10
+    else:
+        print("Invalid choice. Defaulting to Warrior.")
+        return "Warrior", 40, 8
+
+def battle(player, enemy):
+    print(f"\nA wild {enemy.name} appears!")
+
+    while player.is_alive() and enemy.is_alive():
+        print("\nChoose an action:")
+        print("1. Attack")
+        print("2. Heal")
+        print("3. Use Potion (x{})".format(player.inventory.get("potion", 0)))
+        action = input("> ")
+
+        if action == "1":
+            player.deal_damage(enemy)
+        elif action == "2":
+            heal = random.randint(5, 10)
+            player.hp = min(player.max_hp, player.hp + heal)
+            print(f"{player.name} heals for {heal}. HP is now {player.hp}.")
+        elif action == "3":
+            player.use_potion()
+        else:
+            print("Invalid action!")
+
+        if enemy.is_alive():
+            enemy.deal_damage(player)
+
+    if player.is_alive():
+        print(f"\nYou defeated the {enemy.name}!")
+        return True
+    else:
+        print("\nYou were defeated...")
+        return False
+
+def reward_choice(player):
+    print("\nChoose your reward:")
+    print("1. Increase Attack (+2)")
+    print("2. Increase Max HP (+10)")
+    choice = input("> ")
+    if choice == "1":
+        player.increase_attack(2)
+    elif choice == "2":
+        player.increase_max_hp(10)
+    else:
+        print("Invalid choice, no reward granted.")
