@@ -1,0 +1,23 @@
+from character import Character,choose_class,battle,reward_choice,
+if __name__ == "__main__":
+    role, hp, atk = choose_class()
+    name_input=input("What is your name: ")
+    player = Character(name_input, hp=hp, attack=atk, role=role)
+    print("""
+..............Your adventure begins..............
+
+---------------------------------------------------------
+    """)
+
+    enemies = [
+        {"name": "Goblin", "hp": 20, "attack": 5},
+        {"name": "Orc", "hp": 35, "attack": 7},
+        {"name": "Evil Lord", "hp": 45, "attack": 8}
+    ]
+
+    for enemy_data in enemies:
+        enemy = Character(enemy_data["name"], enemy_data["hp"], enemy_data["attack"], role="Enemy")
+        won = battle(player, enemy)
+        if not won:
+            break
+        reward_choice(player)
